@@ -15,10 +15,26 @@ class ChimpTest:
         self.strikes = strikes
         self.currentnum = 1
 
-        self.square_size = (SCREEN_HEIGHT // self.rows) - 2*(SQR_MARGIN + SQR_STROKE)
+        self.square_size = self.calc_square_size()
+        self.board_offset = self.calc_board_offset()
+
+        self.menu_surf = pg.Surface((MENU_WIDTH, SCREEN_HEIGHT))
+        self.menu_rect = self.menu_surf.get_rect(topright=(SCREEN_WIDTH, 0))
 
         self.create_board()
         self.create_squares()
+
+    def calc_square_size(self) -> int:
+        return min(
+            (SCREEN_HEIGHT - (self.rows+1)*SQR_MARGIN) // self.rows,
+            (BOARD_WIDTH - (self.cols+1)*SQR_MARGIN) // self.cols
+        )
+
+    def calc_board_offset(self) -> pg.Vector2:
+        board_width = self.cols*self.square_size + (self.cols+1)*SQR_MARGIN
+        board_height = self.rows*self.square_size + (self.rows+1)*SQR_MARGIN
+        print(board_width, board_height)
+        return pg.Vector2(BOARD_WIDTH // 2 - board_width // 2, SCREEN_HEIGHT // 2 - board_height // 2)
 
     def create_board(self) -> None:
         board = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
@@ -36,9 +52,9 @@ class ChimpTest:
         for ri,r in enumerate(self.board):
             for ci,c in enumerate(r):
                 pos = pg.Vector2(
-                    ci*(self.square_size + SQR_MARGIN + SQR_STROKE) + SQR_MARGIN + SQR_STROKE,
-                    ri*(self.square_size + SQR_MARGIN + SQR_STROKE) + SQR_MARGIN + SQR_STROKE
-                )
+                    ci*(self.square_size + SQR_MARGIN) + SQR_MARGIN,
+                    ri*(self.square_size + SQR_MARGIN) + SQR_MARGIN
+                ) + self.board_offset
                 square = Square(pos, self.square_size, c)
                 self.squares.add(square)
 
@@ -68,7 +84,8 @@ class ChimpTest:
                 break
 
     def draw_board(self) -> None:
-        pass
+        self.menu_surf.fill('blue')
+        self.surface.blit(self.menu_surf, self.menu_rect)
 
     def draw_squares(self) -> None:
         mouse_pos = pg.mouse.get_pos()

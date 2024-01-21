@@ -1,13 +1,17 @@
 import pygame as pg
 pg.font.init()
 
-SCREEN_WIDTH = 1600
 SCREEN_HEIGHT = 900
+BOARD_WIDTH = 1500
+MENU_WIDTH = 300
+SCREEN_WIDTH = BOARD_WIDTH + MENU_WIDTH
 
 SQR_MARGIN = 10
 SQR_STROKE = 5
 SQR_CLR_DEFAULT = 'white'
 SQR_CLR_HLIGHT = 'lightgray'
+
+MENU_CLR = 'gray'
 
 FONT = "/System/Library/Fonts/Supplemental/Arial Rounded Bold.ttf"
 FONTSIZE = 36
