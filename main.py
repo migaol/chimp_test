@@ -23,15 +23,19 @@ def renderspeed(run):
             f"peak: {speed['slowest']*1000:.4f}ms  " +
             f"MEMORY current: {current_mem/100:.3f}kb  peak: {peak_mem/100:.3f}kb")
 
-game = ChimpTest(surface=screen, rows=5, cols=8, level=20, strikes=3)
+game = ChimpTest(surface=screen, rows=9, cols=16, level=5, strikes=3)
 
 while True:
     for event in pg.event.get():
         if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == KEY_QUIT):
             pg.quit()
             sys.exit()
+        if event.type == pg.MOUSEBUTTONUP:
+            mouse_pos = pg.mouse.get_pos()
+            game.click(mouse_pos)
 
-    renderspeed(game.run)
+    # renderspeed(game.run)
+    game.run()
     
     pg.display.update()
     clock.tick(60)

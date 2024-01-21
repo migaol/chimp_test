@@ -1,3 +1,4 @@
+from typing import Tuple
 from settings import *
 from square import Square
 import pygame as pg
@@ -14,7 +15,7 @@ class ChimpTest:
         self.strikes = strikes
         self.currentnum = 1
 
-        self.square_size = (SCREEN_HEIGHT // self.rows) - 2*(SQUARE_MARGIN + SQUARE_STROKE)
+        self.square_size = (SCREEN_HEIGHT // self.rows) - 2*(SQR_MARGIN + SQR_STROKE)
 
         self.create_board()
         self.create_squares()
@@ -34,32 +35,46 @@ class ChimpTest:
         self.squares = pg.sprite.Group()
         for ri,r in enumerate(self.board):
             for ci,c in enumerate(r):
-                pos = pg.Vector2(ci*(self.square_size + SQUARE_MARGIN + SQUARE_STROKE) + SQUARE_MARGIN + SQUARE_STROKE,
-                                 ri*(self.square_size + SQUARE_MARGIN + SQUARE_STROKE) + SQUARE_MARGIN + SQUARE_STROKE)
+                pos = pg.Vector2(
+                    ci*(self.square_size + SQR_MARGIN + SQR_STROKE) + SQR_MARGIN + SQR_STROKE,
+                    ri*(self.square_size + SQR_MARGIN + SQR_STROKE) + SQR_MARGIN + SQR_STROKE
+                )
                 square = Square(pos, self.square_size, c)
                 self.squares.add(square)
 
-    def check_cell(self, row: int, col: int) -> bool:
-        return (self.board[row][col] == self.currentnum)
-    
     def next_level(self) -> None:
         self.level += 1
         self.currentnum = 1
         self.create_board()
+        self.create_squares()
 
     def fail_level(self) -> None:
+        self.strikes -= 1
         self.currentnum = 1
         self.create_board()
+        self.create_squares()
+
+    def click(self, mouse_pos: Tuple[int, int]) -> None:
+        square: Square
+        for square in self.squares:
+            if square.is_clicked(mouse_pos):
+                if square.num == self.currentnum:
+                    if self.currentnum == self.level: self.next_level()
+                    else:
+                        square.num = 0
+                        self.currentnum += 1
+                else:
+                    self.fail_level()
+                break
 
     def draw_board(self) -> None:
         pass
 
-    def draw_square(self) -> None:
-        pass
-
-    def draw_num(self) -> None:
-        pass
+    def draw_squares(self) -> None:
+        mouse_pos = pg.mouse.get_pos()
+        self.squares.update(mouse_pos)
+        self.squares.draw(self.surface)
 
     def run(self) -> None:
-        self.squares.draw(self.surface)
-        self.squares.update(self.surface)
+        self.draw_board()
+        self.draw_squares()
