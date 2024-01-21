@@ -5,7 +5,7 @@ import pygame as pg
 class Square(pg.sprite.Sprite):
     def __init__(self, pos: pg.Vector2, size: int, num: int) -> None:
         super().__init__()
-        self.image = pg.Surface((size, size))
+        self.image = pg.Surface((size, size), pg.SRCALPHA)
         self.fill = SQR_CLR_DEFAULT
         self.image.fill(self.fill)
         self.rect = self.image.get_rect(topleft = pos)

@@ -1,6 +1,7 @@
 from typing import Tuple
 from settings import *
 from square import Square
+from menu import Menu
 import pygame as pg
 from random import randint
 
@@ -18,8 +19,7 @@ class ChimpTest:
         self.square_size = self.calc_square_size()
         self.board_offset = self.calc_board_offset()
 
-        self.menu_surf = pg.Surface((MENU_WIDTH, SCREEN_HEIGHT))
-        self.menu_rect = self.menu_surf.get_rect(topright=(SCREEN_WIDTH, 0))
+        self.menu = pg.sprite.GroupSingle(Menu())
 
         self.create_board()
         self.create_squares()
@@ -58,17 +58,20 @@ class ChimpTest:
                 square = Square(pos, self.square_size, c)
                 self.squares.add(square)
 
+    def end_level(self) -> None:
+        self.create_board()
+        self.create_squares()
+        self.menu.sprite.reset_time()
+
     def next_level(self) -> None:
         self.level += 1
         self.currentnum = 1
-        self.create_board()
-        self.create_squares()
+        self.end_level()
 
     def fail_level(self) -> None:
         self.strikes -= 1
         self.currentnum = 1
-        self.create_board()
-        self.create_squares()
+        self.end_level()
 
     def click(self, mouse_pos: Tuple[int, int]) -> None:
         square: Square
@@ -83,9 +86,9 @@ class ChimpTest:
                     self.fail_level()
                 break
 
-    def draw_board(self) -> None:
-        self.menu_surf.fill('blue')
-        self.surface.blit(self.menu_surf, self.menu_rect)
+    def draw_menu(self) -> None:
+        self.menu.update()
+        self.menu.draw(self.surface)
 
     def draw_squares(self) -> None:
         mouse_pos = pg.mouse.get_pos()
@@ -93,5 +96,5 @@ class ChimpTest:
         self.squares.draw(self.surface)
 
     def run(self) -> None:
-        self.draw_board()
+        self.draw_menu()
         self.draw_squares()
