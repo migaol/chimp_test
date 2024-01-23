@@ -18,6 +18,7 @@ class ChimpTest:
 
         self.square_size = self.calc_square_size()
         self.board_offset = self.calc_board_offset()
+        self.squares = None
 
         self.menu = pg.sprite.GroupSingle(Menu())
 
@@ -48,9 +49,15 @@ class ChimpTest:
         self.board = board
 
     def create_squares(self) -> None:
-        self.squares = pg.sprite.Group()
+        if self.squares:
+            self.surface.fill('black')
+            for square in self.squares:
+                square.kill()
+        else: self.squares = pg.sprite.Group()
+
         for ri,r in enumerate(self.board):
             for ci,c in enumerate(r):
+                if c == 0: continue
                 pos = pg.Vector2(
                     ci*(self.square_size + SQR_MARGIN) + SQR_MARGIN,
                     ri*(self.square_size + SQR_MARGIN) + SQR_MARGIN
@@ -76,11 +83,11 @@ class ChimpTest:
     def click(self, mouse_pos: Tuple[int, int]) -> None:
         square: Square
         for square in self.squares:
-            if square.is_clicked(mouse_pos):
+            if square.collidepoint(mouse_pos):
                 if square.num == self.currentnum:
                     if self.currentnum == self.level: self.next_level()
                     else:
-                        square.num = 0
+                        square.click()
                         self.currentnum += 1
                 else:
                     self.fail_level()
@@ -92,7 +99,7 @@ class ChimpTest:
 
     def draw_squares(self) -> None:
         mouse_pos = pg.mouse.get_pos()
-        self.squares.update(mouse_pos)
+        self.squares.update(mouse_pos, (self.currentnum == 1))
         self.squares.draw(self.surface)
 
     def run(self) -> None:

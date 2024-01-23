@@ -23,14 +23,14 @@ class Menu(pg.sprite.Sprite):
     def reset_time(self) -> None:
         self.start_time = time.time()
     
-    def get_time(self) -> int:
-        return round(time.time() - self.start_time, 1)
+    def draw_time(self) -> int:
+        t = round(time.time() - self.start_time, 2)
+        text_time = self.font.render(f"{t:.2f}", True, 'black')
+        text_time_rect = text_time.get_rect()
+        text_time_rect.center = self.image.get_rect().center
+        self.image.blit(text_time, text_time_rect)
 
     def update(self) -> None:
         self.image.fill(self.fill)
         self.image.blit(self.text_title, self.text_title_rect)
-
-        self.text_time = self.font.render(str(self.get_time()), True, 'black')
-        self.text_time_rect = self.text_time.get_rect()
-        self.text_time_rect.center = self.image.get_rect().center
-        self.image.blit(self.text_time, self.text_time_rect)
+        self.draw_time()

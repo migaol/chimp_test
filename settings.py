@@ -2,7 +2,7 @@ import pygame as pg
 pg.font.init()
 
 SCREEN_HEIGHT = 900
-BOARD_WIDTH = 1500
+BOARD_WIDTH = 1200
 MENU_WIDTH = 300
 SCREEN_WIDTH = BOARD_WIDTH + MENU_WIDTH
 
@@ -10,6 +10,7 @@ SQR_MARGIN = 10
 SQR_STROKE = 5
 SQR_CLR_DEFAULT = 'white'
 SQR_CLR_HLIGHT = 'lightgray'
+SQR_CLR_CLICKED = 'black'
 
 MENU_CLR = 'gray'
 
