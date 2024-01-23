@@ -23,7 +23,7 @@ def renderspeed(run):
             f"peak: {speed['slowest']*1000:.4f}ms  " +
             f"MEMORY current: {current_mem/100:.3f}kb  peak: {peak_mem/100:.3f}kb")
 
-game = ChimpTest(surface=screen, rows=2, cols=5, level=5, strikes=3)
+game = ChimpTest(surface=screen, rows=DEFAULT_ROWS, cols=DEFAULT_COLS, level=DEFAULT_LEVEL, strikes=3)
 
 while True:
     for event in pg.event.get():

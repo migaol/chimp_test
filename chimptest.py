@@ -1,7 +1,7 @@
 from typing import Tuple
 from settings import *
 from square import Square
-from menu import Menu
+from menu import Menu, PlusButton
 import pygame as pg
 from random import randint
 
@@ -28,13 +28,13 @@ class ChimpTest:
     def calc_square_size(self) -> int:
         return min(
             (SCREEN_HEIGHT - (self.rows+1)*SQR_MARGIN) // self.rows,
-            (BOARD_WIDTH - (self.cols+1)*SQR_MARGIN) // self.cols
+            (BOARD_WIDTH - (self.cols+1)*SQR_MARGIN) // self.cols,
+            SQR_MAX_SIZE
         )
 
     def calc_board_offset(self) -> pg.Vector2:
         board_width = self.cols*self.square_size + (self.cols+1)*SQR_MARGIN
         board_height = self.rows*self.square_size + (self.rows+1)*SQR_MARGIN
-        print(board_width, board_height)
         return pg.Vector2(BOARD_WIDTH // 2 - board_width // 2, SCREEN_HEIGHT // 2 - board_height // 2)
 
     def create_board(self) -> None:
@@ -57,7 +57,7 @@ class ChimpTest:
 
         for ri,r in enumerate(self.board):
             for ci,c in enumerate(r):
-                if c == 0: continue
+                # if c == 0: continue
                 pos = pg.Vector2(
                     ci*(self.square_size + SQR_MARGIN) + SQR_MARGIN,
                     ri*(self.square_size + SQR_MARGIN) + SQR_MARGIN
@@ -66,18 +66,17 @@ class ChimpTest:
                 self.squares.add(square)
 
     def end_level(self) -> None:
+        self.currentnum = 1
         self.create_board()
         self.create_squares()
         self.menu.sprite.reset_time()
 
     def next_level(self) -> None:
         self.level += 1
-        self.currentnum = 1
         self.end_level()
 
     def fail_level(self) -> None:
         self.strikes -= 1
-        self.currentnum = 1
         self.end_level()
 
     def click(self, mouse_pos: Tuple[int, int]) -> None:
@@ -93,8 +92,18 @@ class ChimpTest:
                     self.fail_level()
                 break
 
+        menu: Menu = self.menu.sprite
+        if menu.click(mouse_pos):
+            self.rows = menu.row_slider.val
+            self.cols = menu.col_slider.val
+            self.square_size = self.calc_square_size()
+            self.board_offset = self.calc_board_offset()
+            self.level = DEFAULT_LEVEL
+            self.end_level()
+
     def draw_menu(self) -> None:
-        self.menu.update()
+        mouse_pos = pg.mouse.get_pos()
+        self.menu.update(mouse_pos)
         self.menu.draw(self.surface)
 
     def draw_squares(self) -> None:
