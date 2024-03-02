@@ -21,6 +21,11 @@ class ChimpTest:
         self.squares = None
         
         self.state = 'ready'
+        
+        self.times = {
+            'memorize': [],
+            'total': []
+        }
 
         self.menu = pg.sprite.GroupSingle(Menu())
 
@@ -71,7 +76,7 @@ class ChimpTest:
                 self.squares.add(square)
 
     def end_level(self) -> None:
-        self.state = 'ready'
+        if self.state == 'game': self.state = 'ready'
         self.currentnum = 1
         self.create_board()
         self.create_squares()
@@ -84,10 +89,14 @@ class ChimpTest:
 
     def next_level(self) -> None:
         self.level += 1
+        self.times['total'].append(self.menu.sprite.get_time())
         self.end_level()
 
     def fail_level(self) -> None:
         self.strikes -= 1
+        if self.strikes == 0:
+            self.state = 'game_over'
+            self.export_stats()
         self.end_level()
 
     def click(self, mouse_pos: Tuple[int, int]) -> None:
@@ -101,6 +110,7 @@ class ChimpTest:
             for square in self.squares:
                 if square.collidepoint(mouse_pos):
                     if square.num == self.currentnum:
+                        if self.currentnum == 1: self.times['memorize'].append(menu.get_time())
                         if self.currentnum == self.level: self.next_level()
                         else:
                             square.click()
@@ -146,3 +156,27 @@ class ChimpTest:
             self.draw_ready_screen()
         elif self.state == 'game':
             self.draw_squares()
+        elif self.state == 'game_over':
+            self.draw_game_over()
+
+    def export_stats(self) -> None:
+        with open('stats.txt', 'w') as f:
+            f.write(f"Level\tMemorization Time\tTotal Time\n")
+            for i in range(self.level-1):
+                level_str = f"{i+1:<5}"
+                memorization_time_str = f"{self.times['memorize'][i]:<18}"
+                total_time_str = f"{self.times['total'][i]}\n"
+                f.write(f"{level_str}\t{memorization_time_str}\t{total_time_str}")
+
+    def draw_game_over(self) -> None:
+        text1 = self.font_title.render(f"Game Over", True, 'white')
+        text1_rect = text1.get_rect(center=(BOARD_WIDTH//2, SCREEN_HEIGHT//2))
+        self.surface.blit(text1, text1_rect)
+
+        text2 = self.font_subtitle.render(f"You reached level {self.level}", True, 'white')
+        text2_rect = text2.get_rect(center=(BOARD_WIDTH//2, SCREEN_HEIGHT//2 + text1_rect.height))
+        self.surface.blit(text2, text2_rect)
+
+        text3 = self.font_subtitle.render(f"Your stats can be viewed in 'stats.txt' in the root directory", True, 'white')
+        text3_rect = text3.get_rect(center=(BOARD_WIDTH//2, text2_rect.bottom + text2_rect.height))
+        self.surface.blit(text3, text3_rect)

@@ -151,10 +151,12 @@ class Menu(pg.sprite.Sprite):
         self.time_state = 'running'
         self.start_time = time.time()
     
+    def get_time(self) -> int:
+        return round(time.time() - self.start_time, 2)
+
     def draw_time(self) -> int:
         if self.time_state == 'running':
-            t = round(time.time() - self.start_time, 2)
-            text_time = self.font.render(f"{t:.2f}", True, 'black')
+            text_time = self.font.render(f"{self.get_time():.2f}", True, 'black')
             text_time_rect = text_time.get_rect()
             text_time_rect.center = self.image.get_rect().center
             self.image.blit(text_time, text_time_rect)
