@@ -69,7 +69,7 @@ class PMSlider(pg.sprite.Sprite):
                 2*margin + self.plus.rect.height)
         self.image = pg.Surface(size, pg.SRCALPHA)
         self.image.fill(MENU_CLR)
-        self.rect = self.image.get_rect(topleft=pos)
+        self.rect = self.image.get_rect(center=pos)
 
         self.font = pg.font.Font(FONT, FONTSIZE)
 
@@ -137,23 +137,27 @@ class Menu(pg.sprite.Sprite):
         self.font = pg.font.Font(FONT, FONTSIZE)
 
         self.text_title = self.title_font.render('Chimp Test', True, 'black')
-        self.text_title_rect = self.text_title.get_rect()
-        self.text_title_rect.top = self.image.get_rect().top
+        self.text_title_rect = self.text_title.get_rect(center=(MENU_WIDTH//2, 50))
 
-        self.reset_time()
+        self.time_state = 'stopped'
 
-        self.row_slider = PMSlider((20, 100), DEFAULT_ROWS, 1, MAX_ROWS, 20, 60)
-        self.col_slider = PMSlider((20, 300), DEFAULT_COLS, 1, MAX_COLS, 20, 60)
+        self.row_slider = PMSlider(self.translate_pos((self.rect.centerx, 150)), DEFAULT_ROWS, 1, MAX_ROWS, 20, 60)
+        self.col_slider = PMSlider(self.translate_pos((self.rect.centerx, 300)), DEFAULT_COLS, 1, MAX_COLS, 20, 60)
+
+    def stop_time(self) -> None:
+        self.time_state = 'stopped'
 
     def reset_time(self) -> None:
+        self.time_state = 'running'
         self.start_time = time.time()
     
     def draw_time(self) -> int:
-        t = round(time.time() - self.start_time, 2)
-        text_time = self.font.render(f"{t:.2f}", True, 'black')
-        text_time_rect = text_time.get_rect()
-        text_time_rect.center = self.image.get_rect().center
-        self.image.blit(text_time, text_time_rect)
+        if self.time_state == 'running':
+            t = round(time.time() - self.start_time, 2)
+            text_time = self.font.render(f"{t:.2f}", True, 'black')
+            text_time_rect = text_time.get_rect()
+            text_time_rect.center = self.image.get_rect().center
+            self.image.blit(text_time, text_time_rect)
 
     def translate_pos(self, pos: Tuple[int, int]) -> Tuple[int, int]:
         return (pos[0] - BOARD_WIDTH, pos[1])

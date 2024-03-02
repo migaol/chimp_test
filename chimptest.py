@@ -19,8 +19,13 @@ class ChimpTest:
         self.square_size = self.calc_square_size()
         self.board_offset = self.calc_board_offset()
         self.squares = None
+        
+        self.state = 'ready'
 
         self.menu = pg.sprite.GroupSingle(Menu())
+
+        self.font_title = pg.font.Font(FONT, FONTSIZE*2)
+        self.font_subtitle = pg.font.Font(FONT, FONTSIZE)
 
         self.create_board()
         self.create_squares()
@@ -66,9 +71,15 @@ class ChimpTest:
                 self.squares.add(square)
 
     def end_level(self) -> None:
+        self.state = 'ready'
         self.currentnum = 1
         self.create_board()
         self.create_squares()
+        self.menu.sprite.stop_time()
+
+    def start_level(self) -> None:
+        self.surface.fill('black')
+        self.state = 'game'
         self.menu.sprite.reset_time()
 
     def next_level(self) -> None:
@@ -80,20 +91,25 @@ class ChimpTest:
         self.end_level()
 
     def click(self, mouse_pos: Tuple[int, int]) -> None:
-        square: Square
-        for square in self.squares:
-            if square.collidepoint(mouse_pos):
-                if square.num == self.currentnum:
-                    if self.currentnum == self.level: self.next_level()
-                    else:
-                        square.click()
-                        self.currentnum += 1
-                else:
-                    self.fail_level()
-                break
-
         menu: Menu = self.menu.sprite
-        if menu.click(mouse_pos):
+        menu_clicked = menu.click(mouse_pos)
+        if self.state == 'ready':
+            if not menu_clicked:
+                self.start_level()
+        else:
+            square: Square
+            for square in self.squares:
+                if square.collidepoint(mouse_pos):
+                    if square.num == self.currentnum:
+                        if self.currentnum == self.level: self.next_level()
+                        else:
+                            square.click()
+                            self.currentnum += 1
+                    else:
+                        self.fail_level()
+                    break
+
+        if menu_clicked:
             self.rows = menu.row_slider.val
             self.cols = menu.col_slider.val
             self.square_size = self.calc_square_size()
@@ -111,6 +127,22 @@ class ChimpTest:
         self.squares.update(mouse_pos, (self.currentnum == 1))
         self.squares.draw(self.surface)
 
+    def draw_ready_screen(self) -> None:
+        text1 = self.font_title.render(f"Level {self.level}", True, 'white')
+        text1_rect = text1.get_rect(center=(BOARD_WIDTH//2, SCREEN_HEIGHT//2))
+        self.surface.blit(text1, text1_rect)
+
+        text2 = self.font_subtitle.render(f"Strikes: {self.strikes}", True, 'white')
+        text2_rect = text2.get_rect(center=(BOARD_WIDTH//2, SCREEN_HEIGHT//2 + text1_rect.height))
+        self.surface.blit(text2, text2_rect)
+
+        text3 = self.font_subtitle.render(f"Click to continue", True, 'white')
+        text3_rect = text3.get_rect(center=(BOARD_WIDTH//2, text2_rect.bottom + text2_rect.height))
+        self.surface.blit(text3, text3_rect)
+
     def run(self) -> None:
         self.draw_menu()
-        self.draw_squares()
+        if self.state == 'ready':
+            self.draw_ready_screen()
+        elif self.state == 'game':
+            self.draw_squares()

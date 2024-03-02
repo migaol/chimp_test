@@ -19,7 +19,7 @@ BTN_CLR_DISABLED = (192, 192, 192)
 
 MENU_CLR = 'gray'
 
-FONT = "/System/Library/Fonts/Supplemental/Arial Rounded Bold.ttf"
+FONT = "/System/Library/Fonts/Supplemental/Arial.ttf"
 FONTSIZE = 36
 
 DEFAULT_LEVEL = 1
